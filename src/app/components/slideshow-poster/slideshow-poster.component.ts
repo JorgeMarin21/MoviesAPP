@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { ModalController } from '@ionic/angular';
 import { Pelicula } from 'src/app/interfaces/interfaces';
 import { DetalleComponent } from '../detalle/detalle.component';
@@ -8,16 +8,14 @@ import { DetalleComponent } from '../detalle/detalle.component';
   templateUrl: './slideshow-poster.component.html',
   styleUrls: ['./slideshow-poster.component.scss'],
 })
-export class SlideshowPosterComponent implements OnInit {
+export class SlideshowPosterComponent {
   @Input() peliculas: Pelicula[] = [];
-
+  @Output() isFavorite: EventEmitter<any> = new EventEmitter<any>();
   slideOpts = {
     slidesPerView: 3.3,
     freeMode: true
   };
   constructor(private modalCtrl: ModalController) { }
-
-  ngOnInit() {}
 
   async verDetalle(id: string) {
     const modal = await this.modalCtrl.create({
@@ -25,5 +23,10 @@ export class SlideshowPosterComponent implements OnInit {
       componentProps: { id },
     });
     modal.present();
+    const { data } = await modal.onWillDismiss();
+    if (!data.isFav) {
+      this.isFavorite.emit();
+    }
+
   }
 }
